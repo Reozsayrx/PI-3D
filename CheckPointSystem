@@ -1,0 +1,28 @@
+using UnityEngine;
+using System.Collections;
+
+public class CheckpointSystem : MonoBehaviour {
+	
+	public GameObject[] Checkpoints;
+	public int Saved;
+	
+	// Use this for initialization
+	void Start () {
+		Saved = 0;
+	}
+
+
+
+
+	// Update is called once per frame
+	void Update () {
+		for (int i = 0; i <= Checkpoints.Length; i++){
+			if (Checkpoints[i].GetComponent<Checkpoint>().Active && !Checkpoints[i].GetComponent<Checkpoint>().Seen){
+				Saved = i;
+				Checkpoints[i].GetComponent<Checkpoint>().Seen = true;
+			}
+		}
+	}
+
+
+}
