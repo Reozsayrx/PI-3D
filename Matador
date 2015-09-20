@@ -1,0 +1,19 @@
+using UnityEngine;
+using System.Collections;
+
+public class Matador : MonoBehaviour {
+
+	public bool grounded;
+
+	void OnTriggerEnter(Collider hit){
+		if (hit.tag == "Enemy"){
+			GetComponentInParent<PlayerMovement>().Mola();
+			Destroy(hit.gameObject);
+		}
+			grounded = true;
+	}
+
+	void OnTriggerExit(Collider hit){
+		grounded = false;
+	}
+}
