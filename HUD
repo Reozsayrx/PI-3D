@@ -1,0 +1,21 @@
+using UnityEngine;
+using System.Collections;
+
+public class HUD : MonoBehaviour {
+
+	public static int score;        
+	public GUIText text;
+	public GameObject player;
+	
+	void Awake ()
+	{
+		text = GetComponent <GUIText> ();
+		score = player.GetComponent<PlayerAtributes>().candies;
+	}
+	
+	
+	void Update ()
+	{
+		text.text = "Score: " + score;
+	}
+}
