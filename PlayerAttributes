@@ -1,0 +1,76 @@
+using UnityEngine;
+using System.Collections;
+
+public class PlayerAtributes : MonoBehaviour {
+
+	public int lives;
+	public int candies;
+	public GameObject Menu;
+	public GameObject HUD;
+
+	// Update is called once per frame
+	void Update () {
+		if (candies >= 100) {
+			lives++;
+			candies -= 100;
+		}
+
+
+		if (Input.GetKey(KeyCode.Escape)){
+			Time.timeScale = 0;
+			Menu.SetActive(true);
+		}
+	}
+
+	void OnCollisionEnter(Collision hit) {
+		if (hit.gameObject.tag == "Danger") {
+			Die ();
+		}
+
+		if (hit.gameObject.tag == "Enemy") {
+			Die ();
+		}
+		
+		//if (hit.gameObject.tag == "Enemy") {
+		//if (this.GetComponent<PlayerMovement>().isInvincible){
+		//Destroy(hit.gameObject);
+		//}else{
+		//Die ();
+		//}
+		//}
+
+
+		if (hit.gameObject.tag == "Candy1") {
+			Destroy(hit.gameObject);
+			candies++;
+			HUD.SetActive(true);
+			Invoke("FadeHUD",2f);
+
+
+		}
+
+		if (hit.gameObject.tag == "Candy5") {
+			Destroy(hit.gameObject);
+			candies += 5;
+			HUD.SetActive(true);
+			Invoke("FadeHUD",2f);
+		}
+
+
+	}
+	
+
+	void Die(){
+		lives--;
+			//if (lives > 0) {
+				this.transform.position =  GameObject.Find("CheckSystem").GetComponent<CheckpointSystem>().Checkpoints[GameObject.Find("CheckSystem").GetComponent<CheckpointSystem>().Saved].transform.position;
+			//} else {
+			//	Application.LoadLevel ("Game Over");
+			//}
+	}
+
+	void FadeHUD(){
+		HUD.SetActive(false);
+	}
+	
+}

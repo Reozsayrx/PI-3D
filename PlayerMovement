@@ -1,0 +1,122 @@
+using UnityEngine;
+using System.Collections;
+
+public class PlayerMovement : MonoBehaviour {
+
+	public float speed = 2.0F;
+	public float jumpSpeed = 6.0F;
+	public float molaSpeed = 6.0F;
+	public float turnSmoothing = 15f;
+
+	public bool CanClimb = false;
+	public bool GetOut = false;
+
+	public Rigidbody rb;
+	public GameObject Matador;
+	public GameObject corda;
+
+	float Distance;
+	
+	// Use this for initialization
+	void Start () 
+	{
+		corda = this.gameObject;
+		rb = GetComponent<Rigidbody> ();
+		Matador = GameObject.FindGameObjectWithTag ("Matador");
+	}
+	
+	// Update is called once per frame
+	void FixedUpdate () 
+	{
+		float h = Input.GetAxis("Horizontal");
+		float v = Input.GetAxis("Vertical");
+
+		if (!CanClimb) {
+			Vector3 Movement = new Vector3 (h, 0.0F, v);
+			Movement = Movement * speed * Time.deltaTime;
+			rb.MovePosition (transform.position + Movement);
+
+			if (h != 0.0 || v != 0.0) {
+				Rotation (h, v);
+			}
+		} 
+		if (CanClimb){
+			transform.Translate(new Vector3(0,v,0) * Time.deltaTime*speed);
+			transform.RotateAround (corda.transform.position, Vector3.up, 100 * Time.deltaTime*h);
+		}
+	}
+	
+	void Update()
+	{
+		if (Matador.GetComponent<Matador>().grounded){
+			if (Input.GetKeyDown(KeyCode.Space)|| Input.GetKeyDown(KeyCode.Joystick1Button0)) {
+				Jump ();
+			}
+		}
+		if (CanClimb){
+			if (Input.GetKeyDown(KeyCode.Space)|| Input.GetKeyDown(KeyCode.Joystick1Button0)) {
+				GetOut = true;
+				this.GetComponent<Rigidbody>().isKinematic = false;
+				JumpRope(-this.transform.forward);
+			}
+		}
+
+		if (Input.GetKey(KeyCode.LeftControl)){
+			RaycastHit hit;
+			if (Physics.Raycast(transform.position,transform.TransformDirection(Vector3.forward), out hit)){
+				Distance = hit.distance;
+				if (hit.collider.gameObject.tag == "Enemy" && Distance < 2){
+					Destroy(hit.collider.gameObject);
+				}
+			}
+		}
+
+
+	}
+	
+	void Rotation(float horizontal, float vertical)
+	{
+		Vector3 targetDirection = new Vector3(horizontal, 0f, vertical);
+		Quaternion targetRotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+		Quaternion newRotation = Quaternion.Lerp(GetComponent<Rigidbody>().rotation, targetRotation, turnSmoothing * Time.deltaTime);
+		rb.MoveRotation(newRotation);
+	}
+	
+	public void Jump()
+	{
+		rb.AddForce (Vector3.up * jumpSpeed);
+	}
+
+	public void JumpRope(Vector3 Vec)
+	{
+		rb.AddForce (Vec * jumpSpeed);
+	}
+	
+	public void Mola()
+	{
+		rb.AddForce (Vector3.up * molaSpeed);
+	}
+	
+	void OnCollisionEnter(Collision colisor)
+	{
+		if (colisor.gameObject.tag == "Mola") 
+		{
+			Mola();
+		}
+
+		if (colisor.gameObject.tag == "Corda"){
+			if (!GetOut){
+			CanClimb = true;
+			this.GetComponent<Rigidbody>().isKinematic = true;
+			corda = colisor.gameObject;
+			}
+		}
+	}
+
+	void OnCollisionExit(Collision colisor){
+		if (colisor.gameObject.tag == "Corda") {
+			this.GetComponent<Rigidbody>().isKinematic = false;
+			CanClimb = false;
+		}
+	}
+	}
