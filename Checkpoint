@@ -1,0 +1,21 @@
+using UnityEngine;
+using System.Collections;
+
+public class Checkpoint : MonoBehaviour {
+
+	public bool Active;
+	public bool Seen;
+
+	// Use this for initialization
+	void Start () {
+		Active = false;
+		Seen = false;
+	}
+
+	void OnTriggerEnter(Collider hit){
+		if (hit.tag == "Player") {
+			Active = true;
+		}
+	}
+	
+}
